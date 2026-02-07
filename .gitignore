@@ -1,0 +1,39 @@
+# بيانات المشروع الأساسية - لا ترفعها
+Mouth_and_Oral_Diseases_dataset/
+
+# ملفات بايثون المؤقتة والمترجمة
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# بيئات بايثون الافتراضية
+.env/
+venv/
+env/
+myenv/
+
+# إعدادات المحررات وملفات النظام
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# مخرجات التدريب (الموديلات، اللوجات، البلوتات)
+*.pth
+*.h5
+*.keras
+checkpoints/
+logs/
+runs/
+outputs/
+*.png  # احترافي: تجاهل كل الصور المولدة من الكود
+*.jpg
+
+# ملفات البيانات الكبيرة المؤقتة
+*.csv
+*.npy
+*.npz
+*.pkl
