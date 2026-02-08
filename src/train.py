@@ -18,23 +18,10 @@ config = Config()
 # Training Hyperparameters 
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 150
-WARMUP_EPOCHS = 10  # Warmup for stable training
 MODEL_SAVE_PATH = 'saved_models/resnet_model.h5'
 LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
 
-def lr_schedule(epoch):
-    """Learning rate schedule with warmup."""
-    if epoch < WARMUP_EPOCHS:
-        # Linear warmup
-        return LEARNING_RATE * (epoch + 1) / WARMUP_EPOCHS
-    elif epoch < 50:
-        return LEARNING_RATE
-    elif epoch < 100:
-        return LEARNING_RATE * 0.1
-    else:
-        return LEARNING_RATE * 0.01
-      
 #------------------------------------------------------------
 
 # The Training Function 
@@ -62,38 +49,43 @@ def train_model():
 
   # Setup callbacks
   callbacks = [
-    # Save best model
+    # Save best model (based on validation accuracy)
     tf.keras.callbacks.ModelCheckpoint(
-        MODEL_SAVE_PATH,
+        'saved_models/best_model.h5',
         monitor='val_accuracy',
         save_best_only=True,
         mode='max',
         verbose=1
     ),
-    # Early stopping (increased patience)
+    
+    # Early stopping (be patient with medical data)
     tf.keras.callbacks.EarlyStopping(
-        monitor='val_accuracy',  # Changed from 'val_loss' to 'val_accuracy'
-        patience=20,  # Increased from 15
+        monitor='val_loss',  # Monitor loss, more stable than accuracy
+        patience=25,  # Increased for dental images (can be noisy)
         restore_best_weights=True,
-        verbose=1
+        verbose=1,
+        min_delta=0.001  # Small improvement threshold
     ),
-    # Learning rate scheduler
-    tf.keras.callbacks.LearningRateScheduler(lr_schedule),
-    # TensorBoard logging
+    
+    # TensorBoard for visualization
     tf.keras.callbacks.TensorBoard(
         log_dir=LOG_DIR,
-        histogram_freq=1
+        histogram_freq=1,
+        write_graph=True,
+        write_images=False,
+        profile_batch=0  # Disable profiling to avoid overhead
     ),
-    # Reduce learning rate on plateau
+    
+    # REDUCE LR ON PLATEAU (RECOMMENDED - Use this ONLY)
     tf.keras.callbacks.ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.5,
-        patience=8,  # Reduced from 5
-        min_lr=1e-6,
-        verbose=1
+        monitor='val_loss',  # Watch validation loss
+        factor=0.5,  # Reduce LR by half
+        patience=10,  # Wait 10 epochs with no improvement
+        min_lr=1e-6,  # Minimum learning rate
+        verbose=1,
+        mode='min'
     )
   ]
-
   # Train the model
   print ("Training model....")
   history = model.fit(
@@ -138,6 +130,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
