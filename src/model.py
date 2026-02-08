@@ -75,36 +75,6 @@ class ResNet(Model):
             
         return tf.keras.Sequential(layers_list)
 
-    #---------------------------------------------------------------------
-    def build(self, input_shape):
-        """Properly initializes ALL layers in the network."""
-        super(ResNet, self).build(input_shape)
-        
-        # Build the initial convolutional layer
-        self.initial_conv.build(input_shape)
-        
-        # Build BatchNormalization layers
-        self.initial_bn.build((None, 112, 112, 64))  # Shape after conv
-        
-        # Build residual layers by passing a dummy input through them
-        # This ensures ALL internal layers (conv, bn, etc.) get built
-        dummy_input = tf.keras.Input(shape=input_shape[1:])
-        
-        # Pass through the network to trigger building of all layers
-        x = self.initial_conv(dummy_input)
-        x = self.initial_bn(x)
-        x = tf.nn.relu(x)
-        x = self.initial_pool(x)
-        
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-        
-        x = self.global_pool(x)
-        x = self.dropout(x)
-        x = self.fc(x)  # This builds the Dense layer
-        
     #-----------------------------------------------------------------
     
     def call(self, inputs):
@@ -128,16 +98,27 @@ class ResNet(Model):
 #--------------------------------------------------------------------------------------------
 # A function to build and return the ResNet Model
 def build_resnet(input_shape=(224, 224, 3), num_classes=7):
-    model = ResNet(num_classes=num_classes)
-    model.build((None, *input_shape))
+    """Build and return the ResNet model - FIXED VERSION."""
+    # Create input layer
+    inputs = tf.keras.Input(shape=input_shape)
     
-    return model
+    # Build model using Functional API approach
+    model = ResNet(num_classes=num_classes)
+    
+    # Connect the model by calling it on the input
+    outputs = model(inputs)
+    
+    # Create a proper Keras Model
+    full_model = tf.keras.Model(inputs=inputs, outputs=outputs, name="resnet_model")
+    
+    return full_model
 
 #----------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
     print("Model OK")
+
 
 
 
