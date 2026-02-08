@@ -84,3 +84,34 @@ display_sample_images(train_ds, class_names, "Training Set (With Augmentation)")
 
 print("\n✅ Visualization complete! Check the generated PNG files in your project folder.")
 
+
+
+def plot_training_history(history):
+    """Plot training and validation accuracy/loss."""
+    import matplotlib.pyplot as plt
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+
+    # Plot accuracy
+    ax1.plot(history.history['accuracy'], label='Training Accuracy')
+    ax1.plot(history.history['val_accuracy'], label='Validation Accuracy')
+    ax1.set_title('Model Accuracy')
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Accuracy')
+    ax1.legend()
+    ax1.grid(True)
+
+    # Plot loss
+    ax2.plot(history.history['loss'], label='Training Loss')
+    ax2.plot(history.history['val_loss'], label='Validation Loss')
+    ax2.set_title('Model Loss')
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Loss')
+    ax2.legend()
+    ax2.grid(True)
+
+    plt.tight_layout()
+    plt.savefig('training_history.png')
+    plt.show()
+
+
