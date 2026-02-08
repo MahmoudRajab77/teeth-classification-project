@@ -104,7 +104,7 @@ def train_model():
   print(f"💾 Model saved to 'saved_models/final_model.h5'")
 
   # enf of train_model funcrion 
-  return model, history, tets_results
+  return model, history, test_results
 
 
 
@@ -121,6 +121,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
