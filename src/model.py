@@ -52,9 +52,13 @@ class ResNet(Model):
         self.initial_conv = layers.Conv2D(32, kernel_size=7, strides=2, padding='same', use_bias=False)
         self.initial_bn = layers.BatchNormalization()
         self.initial_pool = layers.MaxPool2D(pool_size=3, strides=2, padding='same')
+
+        # ADD THIS: Second conv for better feature extraction
+        self.initial_conv2 = layers.Conv2D(64, kernel_size=3, strides=1, padding='same', use_bias=False)
+        self.initial_bn2 = layers.BatchNormalization()
         
         # Attention mechanism
-        self.attention = layers.Conv2D(32, 1, activation='sigmoid')
+        self.attention = layers.Conv2D(64, 1, activation='sigmoid')
         
         # Enhanced residual layers
         self.layer1 = self._make_layer(filters=64, num_blocks=2, strides=1, dropout_rate=dropout_rate)
@@ -154,6 +158,7 @@ if __name__ == '__main__':
     print(f"Training output shape: {output_training.shape}")
     
     print("\n✅ Model built and tested successfully!")
+
 
 
 
