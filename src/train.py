@@ -16,8 +16,8 @@ from utils import plot_training_history
 config = Config()
 
 # Training Hyperparameters 
-LEARNING_RATE = 0.001
-NUM_EPOCHS = 50
+LEARNING_RATE = 0.003
+NUM_EPOCHS = 64
 MODEL_SAVE_PATH = 'saved_models/resnet_model.h5'
 LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -59,7 +59,7 @@ def train_model():
       # Early stopping
       tf.keras.callbacks.EarlyStopping(
           monitor='val_loss',
-          patience=10,
+          patience=15,
           restore_best_weights=True,
           verbose=1
       ),
@@ -121,6 +121,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
