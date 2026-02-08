@@ -24,24 +24,25 @@ class ResidualBlock(layers.layer):
         self.skip_bn = layers.BatchNormalization()
   #-------------------------------------------------------------
   def call(self, inputs):
-    # The main path : Conv -> BN -> ReLU -> Conv -> BN
-    x = self.conv1(inputs)
-    x = self.bn1(x)
-    x = tf.nn.relu(x)
-    
-    x = self.conv2(x)
-    x = self.bn2(x)
-    # Skip connection path 
-    identity = inputs 
-    if self.skip_conv is not None:
-      identity = self.skip_conv(identity)
-      identity = self.skip_bn(identity)
+        # Main path: Conv -> BN -> ReLU -> Conv -> BN
+        x = self.conv1(inputs)
+        x = self.bn1(x)
+        x = tf.nn.relu(x)
 
-    # Add the skip connection to the main path 
-    output = x + identity 
-    output = tf.nn.relu(output)
+        x = self.conv2(x)
+        x = self.bn2(x)
 
-    return output
+        # Skip connection path
+        identity = inputs
+        if self.skip_conv is not None:
+            identity = self.skip_conv(identity)
+            identity = self.skip_bn(identity)
+
+        # THE CORE IDEA: Add skip connection
+        output = x + identity
+        output = tf.nn.relu(output)
+
+        return output
 
 #----------------------------------------------------------------------------------------------------------------------------
 # A custom ResNet model built from scratch for 7-class dental classification.
@@ -108,5 +109,6 @@ class ResNet(Model):
     model.build((None, *input_shape))
 
     return model
+
 
 
