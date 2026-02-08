@@ -16,11 +16,13 @@ def get_data_loaders():
     # a tuple to be used for image size 
     img_size = (config.IMG_HEIGHT, config.IMG_WIDTH)
     
-    # Data augmentation for the training set 
+    # Data augmentation for the training set - REVISED
     data_augmentation = keras.Sequential([
-        layers.RandomFlip("horizontal_and_vertical"), 
-        layers.RandomRotation(0.2), 
-        layers.RandomZoom(0.2),
+       layers.RandomFlip("horizontal"),  # Keep only horizontal flips (more realistic)
+       layers.RandomRotation(0.05),      # Reduce from 0.2 to 0.05 (5% rotation)
+       layers.RandomZoom(height_factor=(0.0, 0.05), width_factor=(0.0, 0.05)),  # ZOOM IN only (0-5%), never crop out
+       layers.RandomBrightness(0.05),    # Small brightness changes
+       layers.RandomContrast(0.05),      # Small contrast changes
     ])
     
     
