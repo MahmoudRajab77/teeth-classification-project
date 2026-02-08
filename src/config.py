@@ -4,7 +4,7 @@ import os
 class Config:
     
     #data paths
-    DATA_DIR  = '/home/mahmoud/Desktop/Teeth_DataSet/Teeth_Dataset'
+    DATA_DIR  = '/content/drive/MyDrive/Teeth_Dataset'
     TRAIN_DIR = os.path.join(DATA_DIR, 'Training')
     TEST_DIR  = os.path.join(DATA_DIR, 'Testing')
     VAL_DIR   = os.path.join(DATA_DIR, 'Validation')
