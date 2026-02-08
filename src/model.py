@@ -21,16 +21,16 @@ class ResidualBlock(layers.Layer):
             self.skip_conv = layers.Conv2D(filters, kernel_size=1, strides=strides, use_bias=False)
             self.skip_bn = layers.BatchNormalization()
     #----------------------------------------------------------------
-    def call(self, inputs):
+    def call(self, inputs, training=False):  
         # Main path
         x = self.conv1(inputs)
-        x = self.bn1(x, training=training)
+        x = self.bn1(x, training=training)  
         x = tf.nn.relu(x)
         
         x = self.conv2(x)
-        x = self.bn2(x, training=training)
-        x = self.dropout(x, training=training)
-
+        x = self.bn2(x, training=training)  
+        x = self.dropout(x, training=training)  
+        
         # Skip connection
         identity = inputs
         if self.skip_conv is not None:
@@ -73,11 +73,27 @@ class ResNet(Model):
     # A functtion to create a layer of residual blocks
     def _make_layer(self, filters, num_blocks, strides, dropout_rate):
         layers_list = []
-        layers_list.append(ImprovedResidualBlock(filters, strides=strides, dropout_rate=dropout_rate))
+        # ✅ FIXED: Use 'ResidualBlock' (the actual class name), not 'ImprovedResidualBlock'
+        layers_list.append(ResidualBlock(filters, strides=strides, dropout_rate=dropout_rate))
         for _ in range(1, num_blocks):
-            layers_list.append(ImprovedResidualBlock(filters, strides=1, dropout_rate=dropout_rate))
-        return tf.keras.Sequential(layers_list)
-
+            layers_list.append(ResidualBlock(filters, strides=1, dropout_rate=dropout_rate))
+        
+        # Create Sequential and override its call method to pass 'training'
+        seq = tf.keras.Sequential(layers_list)
+        
+        # Create a wrapper that passes 'training' to all layers
+        class TrainingSequential(tf.keras.layers.Layer):
+            def __init__(self, sequential_layer):
+                super(TrainingSequential, self).__init__()
+                self.sequential_layer = sequential_layer
+            
+            def call(self, inputs, training=False):
+                x = inputs
+                for layer in self.sequential_layer.layers:
+                    x = layer(x, training=training)
+                return x
+        
+        return TrainingSequential(seq)
     #-----------------------------------------------------------------
     
     def call(self, inputs, training=False):
@@ -105,19 +121,19 @@ class ResNet(Model):
         return x
 #--------------------------------------------------------------------------------------------
 # A function to build and return the ResNet Model
-def build_resnet(input_shape=(224, 224, 3), num_classes=7):
-    """Build and return the ResNet model - FIXED VERSION."""
+def build_resnet(input_shape=(224, 224, 3), num_classes=7, dropout_rate=0.4):
+    """Build and return the enhanced ResNet model."""
     # Create input layer
     inputs = tf.keras.Input(shape=input_shape)
     
-    # Build model using Functional API approach
-    model = ResNet(num_classes=num_classes)
+    # Build enhanced model
+    model = ResNet(num_classes=num_classes, dropout_rate=dropout_rate)
     
     # Connect the model by calling it on the input
     outputs = model(inputs)
     
     # Create a proper Keras Model
-    full_model = tf.keras.Model(inputs=inputs, outputs=outputs, name="resnet_model")
+    full_model = tf.keras.Model(inputs=inputs, outputs=outputs, name="enhanced_resnet_model")
     
     return full_model
 
@@ -125,7 +141,19 @@ def build_resnet(input_shape=(224, 224, 3), num_classes=7):
 if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
-    print("Model OK")
+    
+    # Test with training=False and training=True
+    test_input = tf.random.normal([1, 224, 224, 3])
+    
+    print("\nTesting inference mode (training=False):")
+    output_inference = model(test_input, training=False)
+    print(f"Inference output shape: {output_inference.shape}")
+    
+    print("\nTesting training mode (training=True):")
+    output_training = model(test_input, training=True)
+    print(f"Training output shape: {output_training.shape}")
+    
+    print("\n✅ Model built and tested successfully!")
 
 
 
