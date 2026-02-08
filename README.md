@@ -5,14 +5,23 @@ This project implements a **ResNet architecture from scratch** using TensorFlow 
 
 ## Project Structure
 teeth-classification-project/
+
 ├── src/ # Source code
+
 │ ├── config.py # Configuration settings
+
 │ ├── data_loader.py # Data loading and augmentation
+
 │ ├── model.py # model architecture script
+
 │ ├── train.py # Training scripts
+
 │ ├── utils.py # Visualization scripts
+
 │ └── requirements.txt # Python dependencies
+
 ├── .gitignore # Files to ignore (dataset, etc.)
+
 └── README.md # This file
 
 
