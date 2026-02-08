@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 # Import the project modules
-from src.config import Config
-from src.data_loader import get_data_loaders
-from src.model import build_resnet
-from src.utils import plot_training_history  
+from config import Config
+from data_loader import get_data_loaders
+from model import build_resnet
+from utils import plot_training_history  
 
 
 # Configuration 
@@ -121,6 +121,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
