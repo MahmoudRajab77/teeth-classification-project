@@ -3,6 +3,8 @@ from tensorflow import keras
 from keras import layers
 import os 
 from config import Config 
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 
 
@@ -18,12 +20,14 @@ def get_data_loaders():
     
     # Data augmentation for the training set - REVISED
     data_augmentation = keras.Sequential([
-       layers.RandomFlip("horizontal_and_vertical"),
-       layers.RandomRotation(0.2),
-       layers.RandomZoom(0.1),  # Reduced zoom
-       layers.RandomBrightness(0.2),  # Important for photos
-       layers.RandomContrast(0.2),    # Important for photos
-       layers.RandomSaturation(0.2),  # NEW: for color photos
+       layers.RandomFlip("horizontal"),  # Only horizontal for dental symmetry
+        layers.RandomRotation(0.1),  # Reduced from 0.2
+        layers.RandomZoom(0.05),  # Reduced from 0.1
+        layers.RandomBrightness(0.1),  # Reduced from 0.2
+        layers.RandomContrast(0.1),  # Reduced from 0.2
+        # Medical-specific augmentations:
+        layers.GaussianNoise(0.01),  # Add slight noise for robustness
+        # Remove RandomSaturation for grayscale/medical images
     ])
     
     
@@ -87,9 +91,23 @@ def get_data_loaders():
         class_names = [c for c in class_names if os.path.isdir(os.path.join(config.TRAIN_DIR, c))]
 
     print(f"Class names: {class_names}")
+
+
+    # Get class distribution
+    class_counts = []
+    for _, labels in train_dataset:
+        class_indices = np.argmax(labels.numpy(), axis=1)
+        class_counts.extend(class_indices)
+    
+    class_weights = compute_class_weight(
+        'balanced',
+        classes=np.arange(len(class_names)),
+        y=class_counts
+    )
+    class_weight_dict = {i: weight for i, weight in enumerate(class_weights)}
     
     
-    return train_dataset, val_dataset, test_dataset, class_names
+    return train_dataset, val_dataset, test_dataset, class_names, class_weight_dict
 
 
 # Testing the data loader function  
