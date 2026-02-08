@@ -77,10 +77,34 @@ class ResNet(Model):
 
     #---------------------------------------------------------------------
     def build(self, input_shape):
-        """Fix for 'unbuilt state' warning - properly initializes layers."""
+        """Properly initializes ALL layers in the network."""
         super(ResNet, self).build(input_shape)
+        
         # Build the initial convolutional layer
         self.initial_conv.build(input_shape)
+        
+        # Build BatchNormalization layers
+        self.initial_bn.build((None, 112, 112, 64))  # Shape after conv
+        
+        # Build residual layers by passing a dummy input through them
+        # This ensures ALL internal layers (conv, bn, etc.) get built
+        dummy_input = tf.keras.Input(shape=input_shape[1:])
+        
+        # Pass through the network to trigger building of all layers
+        x = self.initial_conv(dummy_input)
+        x = self.initial_bn(x)
+        x = tf.nn.relu(x)
+        x = self.initial_pool(x)
+        
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        
+        x = self.global_pool(x)
+        x = self.dropout(x)
+        x = self.fc(x)  # This builds the Dense layer
+        
     #-----------------------------------------------------------------
     
     def call(self, inputs):
@@ -114,5 +138,6 @@ if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
     print("Model OK")
+
 
 
