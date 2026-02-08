@@ -75,6 +75,12 @@ class ResNet(Model):
             
         return tf.keras.Sequential(layers_list)
 
+    #---------------------------------------------------------------------
+    def build(self, input_shape):
+        """Fix for 'unbuilt state' warning - properly initializes layers."""
+        super(ResNet, self).build(input_shape)
+        # Build the initial convolutional layer
+        self.initial_conv.build(input_shape)
     #-----------------------------------------------------------------
     
     def call(self, inputs):
@@ -108,4 +114,5 @@ if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
     print("Model OK")
+
 
