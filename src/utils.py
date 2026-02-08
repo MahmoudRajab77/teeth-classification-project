@@ -6,7 +6,7 @@ from config import Config
 
 
 print ("loading dataset....")
-train_ds, val_ds, test_ds, class_names = get_data_loaders()
+train_ds, val_ds, test_ds, class_names, class_weight_dict = get_data_loaders()
 
 
 def plot_calss_distribution(dataset, class_names, title):
@@ -113,5 +113,6 @@ def plot_training_history(history):
     plt.tight_layout()
     plt.savefig('training_history.png')
     plt.show()
+
 
 
