@@ -105,6 +105,11 @@ class ResNet(Model):
         x = self.initial_bn(x, training=training)
         x = tf.nn.relu(x)
         x = self.initial_pool(x)
+
+        # second conv layer 
+        x = self.initial_conv2(x)        # Convert 32→64 channels
+        x = self.initial_bn2(x, training=training)
+        x = tf.nn.relu(x)
         
         # Apply attention
         attention_weights = self.attention(x)
@@ -158,6 +163,7 @@ if __name__ == '__main__':
     print(f"Training output shape: {output_training.shape}")
     
     print("\n✅ Model built and tested successfully!")
+
 
 
 
