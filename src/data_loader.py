@@ -89,7 +89,8 @@ def get_data_loaders():
     return train_dataset, val_dataset, test_dataset, class_names
 
 
-
+# Testing the data loader function  
+'''
 if __name__ == '__main__':
     train_ds, val_ds, test_ds, class_names = get_data_loaders()      # call the function and reccive the returned values 
     print ('Data was loaded successfully.')
@@ -98,4 +99,5 @@ if __name__ == '__main__':
     for images, labels in train_ds.take(1):
         print(f"Batch image shape: {images.shape}")
         print(f"Batch label shape: {labels.shape}")
+'''
          
