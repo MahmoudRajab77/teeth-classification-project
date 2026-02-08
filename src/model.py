@@ -6,7 +6,7 @@ from tensorflow.keras import layers, Model
 
 # A basic Residual block with 2 convolutional layers and a skip connection (The core building block of ResNet)
 class ResidualBlock(layers.Layer):
-    def __init__(self, filters, strides=1):
+    def __init__(self, filters, strides=1, dropout_rate=0.2):
         super(ResidualBlock, self).__init__()
         self.conv1 = layers.Conv2D(filters, kernel_size=3, strides=strides, padding='same', use_bias=False)
         self.bn1 = layers.BatchNormalization()
@@ -14,27 +14,29 @@ class ResidualBlock(layers.Layer):
         self.conv2 = layers.Conv2D(filters, kernel_size=3, strides=1, padding='same', use_bias=False)
         self.bn2 = layers.BatchNormalization()
         
+        self.dropout = layers.Dropout(dropout_rate)
+        
         self.skip_conv = None
         if strides != 1:
             self.skip_conv = layers.Conv2D(filters, kernel_size=1, strides=strides, use_bias=False)
             self.skip_bn = layers.BatchNormalization()
     #----------------------------------------------------------------
     def call(self, inputs):
-        # Main path: Conv -> BN -> ReLU -> Conv -> BN
+        # Main path
         x = self.conv1(inputs)
-        x = self.bn1(x)
+        x = self.bn1(x, training=training)
         x = tf.nn.relu(x)
         
         x = self.conv2(x)
-        x = self.bn2(x)
+        x = self.bn2(x, training=training)
+        x = self.dropout(x, training=training)
 
-        # Skip connection path
+        # Skip connection
         identity = inputs
         if self.skip_conv is not None:
             identity = self.skip_conv(identity)
-            identity = self.skip_bn(identity)
+            identity = self.skip_bn(identity, training=training)
             
-        # THE CORE IDEA: Add skip connection
         output = x + identity
         output = tf.nn.relu(output)
         
@@ -43,55 +45,61 @@ class ResidualBlock(layers.Layer):
 
 # A custom ResNet model built from scratch for 7-class dental classification.
 class ResNet(Model):
-    def __init__(self, num_classes=7):
+    def __init__(self, num_classes=7, dropout_rate=0.3):
         super(ResNet, self).__init__()
-        # Initial layers (not residual blocks)
-        self.initial_conv = layers.Conv2D(64, kernel_size=7, strides=2, padding='same', use_bias=False)
+        
+        # Initial processing
+        self.initial_conv = layers.Conv2D(32, kernel_size=7, strides=2, padding='same', use_bias=False)
         self.initial_bn = layers.BatchNormalization()
         self.initial_pool = layers.MaxPool2D(pool_size=3, strides=2, padding='same')
-
-        #Create 4 groups of residual blocks
-        # NEW Pattern: [2, 2, 2, 2] blocks per group (ResNet-18 style)
-        self.layer1 = self._make_layer(filters=64, num_blocks=2, strides=1)
-        self.layer2 = self._make_layer(filters=128, num_blocks=2, strides=2)
-        self.layer3 = self._make_layer(filters=256, num_blocks=2, strides=2)
-        self.layer4 = self._make_layer(filters=512, num_blocks=2, strides=2)
-
-        # Final classification layers
+        
+        # Attention mechanism
+        self.attention = layers.Conv2D(32, 1, activation='sigmoid')
+        
+        # Enhanced residual layers
+        self.layer1 = self._make_layer(filters=64, num_blocks=2, strides=1, dropout_rate=dropout_rate)
+        self.layer2 = self._make_layer(filters=128, num_blocks=2, strides=2, dropout_rate=dropout_rate)
+        self.layer3 = self._make_layer(filters=256, num_blocks=2, strides=2, dropout_rate=dropout_rate)
+        self.layer4 = self._make_layer(filters=512, num_blocks=2, strides=2, dropout_rate=dropout_rate)
+        
+        # Additional regularization
         self.global_pool = layers.GlobalAveragePooling2D()
-        self.dropout = layers.Dropout(0.5)  # <-- decrese the cells by 50% randomly 
+        self.batch_norm = layers.BatchNormalization()
+        self.dropout = layers.Dropout(dropout_rate)
         self.fc = layers.Dense(num_classes, activation='softmax')
+
     #----------------------------------------------------------------
 
     # A functtion to create a layer of residual blocks
-    def _make_layer(self, filters, num_blocks, strides):
+    def _make_layer(self, filters, num_blocks, strides, dropout_rate):
         layers_list = []
-        # First block in the layer
-        layers_list.append(ResidualBlock(filters, strides=strides))
-
-        # Add the remaining blocks (all with stride=1)
+        layers_list.append(ImprovedResidualBlock(filters, strides=strides, dropout_rate=dropout_rate))
         for _ in range(1, num_blocks):
-            layers_list.append(ResidualBlock(filters, strides=1))
-            
+            layers_list.append(ImprovedResidualBlock(filters, strides=1, dropout_rate=dropout_rate))
         return tf.keras.Sequential(layers_list)
 
     #-----------------------------------------------------------------
     
-    def call(self, inputs):
+    def call(self, inputs, training=False):
         x = self.initial_conv(inputs)
-        x = self.initial_bn(x)
+        x = self.initial_bn(x, training=training)
         x = tf.nn.relu(x)
         x = self.initial_pool(x)
-
-        # Go through all residual layers
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-
+        
+        # Apply attention
+        attention_weights = self.attention(x)
+        x = x * attention_weights
+        
+        # Residual layers
+        x = self.layer1(x, training=training)
+        x = self.layer2(x, training=training)
+        x = self.layer3(x, training=training)
+        x = self.layer4(x, training=training)
+        
         # Final classification
         x = self.global_pool(x)
-        x = self.dropout(x)  # <-- applying the dropout
+        x = self.batch_norm(x, training=training)
+        x = self.dropout(x, training=training)
         x = self.fc(x)
         
         return x
@@ -118,6 +126,7 @@ if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
     print("Model OK")
+
 
 
 
