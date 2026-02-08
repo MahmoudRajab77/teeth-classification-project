@@ -18,9 +18,24 @@ config = Config()
 # Training Hyperparameters 
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 150
+WARMUP_EPOCHS = 10  # Warmup for stable training
 MODEL_SAVE_PATH = 'saved_models/resnet_model.h5'
 LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
+
+def lr_schedule(epoch):
+    """Learning rate schedule with warmup."""
+    if epoch < WARMUP_EPOCHS:
+        # Linear warmup
+        return LEARNING_RATE * (epoch + 1) / WARMUP_EPOCHS
+    elif epoch < 50:
+        return LEARNING_RATE
+    elif epoch < 100:
+        return LEARNING_RATE * 0.1
+    else:
+        return LEARNING_RATE * 0.01
+      
+#------------------------------------------------------------
 
 # The Training Function 
 def train_model():
@@ -28,12 +43,11 @@ def train_model():
 
   # load data 
   print ("Loading Dataset......")
-  train_ds, val_ds, test_ds, class_names = get_data_loaders()
+  train_ds, val_ds, test_ds, class_names, class_weight_dict = get_data_loaders()
 
 
   # build model 
-  model = build_resnet (input_shape=(config.IMG_HEIGHT, config.IMG_WIDTH, 3), num_classes = config.NUM_CLASSES)
-
+  model = build_resnet(input_shape=(config.IMG_HEIGHT, config.IMG_WIDTH, 3), num_classes=config.NUM_CLASSES)
   model.summary()
 
   # Compile the Model 
@@ -48,44 +62,47 @@ def train_model():
 
   # Setup callbacks
   callbacks = [
-      # Save best model
-      tf.keras.callbacks.ModelCheckpoint(
-          MODEL_SAVE_PATH,
-          monitor='val_accuracy',
-          save_best_only=True,
-          mode='max',
-          verbose=1
-      ),
-      # Early stopping
-      tf.keras.callbacks.EarlyStopping(
-          monitor='val_loss',
-          patience=15,
-          restore_best_weights=True,
-          verbose=1
-      ),
-      # TensorBoard logging
-      tf.keras.callbacks.TensorBoard(
-          log_dir=LOG_DIR,
-          histogram_freq=1
-      ),
-      # Reduce learning rate on plateau
-      tf.keras.callbacks.ReduceLROnPlateau(
-          monitor='val_loss',
-          factor=0.5,
-          patience=5,
-          min_lr=1e-6,
-          verbose=1
-      )
+    # Save best model
+    tf.keras.callbacks.ModelCheckpoint(
+        MODEL_SAVE_PATH,
+        monitor='val_accuracy',
+        save_best_only=True,
+        mode='max',
+        verbose=1
+    ),
+    # Early stopping (increased patience)
+    tf.keras.callbacks.EarlyStopping(
+        monitor='val_accuracy',  # Changed from 'val_loss' to 'val_accuracy'
+        patience=20,  # Increased from 15
+        restore_best_weights=True,
+        verbose=1
+    ),
+    # Learning rate scheduler
+    tf.keras.callbacks.LearningRateScheduler(lr_schedule),
+    # TensorBoard logging
+    tf.keras.callbacks.TensorBoard(
+        log_dir=LOG_DIR,
+        histogram_freq=1
+    ),
+    # Reduce learning rate on plateau
+    tf.keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=8,  # Reduced from 5
+        min_lr=1e-6,
+        verbose=1
+    )
   ]
 
   # Train the model
   print ("Training model....")
-  history = model.fit (
+  history = model.fit(
     train_ds, 
-    validation_data = val_ds, 
-    epochs = NUM_EPOCHS, 
-    callbacks = callbacks, 
-    verbose = 1
+    validation_data=val_ds, 
+    epochs=NUM_EPOCHS, 
+    callbacks=callbacks, 
+    class_weight=class_weight_dict,  # ADD THIS LINE
+    verbose=1
   )
 
   # Evaluate on test set
@@ -121,6 +138,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
