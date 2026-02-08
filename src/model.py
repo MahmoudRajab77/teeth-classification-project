@@ -100,7 +100,7 @@ class ResNet(Model):
         
      return x
 
-#--------------------------------------------------------
+  #--------------------------------------------------------
   # A function to build and return the ResNet Model 
   def build_resnet(input_shape=(244,244,3), num_classes = 7):
     model = ResNet(num_classes = num_classes)
@@ -108,4 +108,5 @@ class ResNet(Model):
     model.build((None, *input_shape))
 
     return model
+
 
