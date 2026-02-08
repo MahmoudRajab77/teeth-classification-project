@@ -50,15 +50,16 @@ class ResNet(Model):
         self.initial_bn = layers.BatchNormalization()
         self.initial_pool = layers.MaxPool2D(pool_size=3, strides=2, padding='same')
 
-        # Create 4 groups of residual blocks
-        # Pattern for a small ResNet: [1, 1, 1, 1] blocks per group
-        self.layer1 = self._make_layer(64, 1, 1)
-        self.layer2 = self._make_layer(128, 1, 2)
-        self.layer3 = self._make_layer(256, 1, 2)
-        self.layer4 = self._make_layer(512, 1, 2)
+        #Create 4 groups of residual blocks
+        # NEW Pattern: [2, 2, 2, 2] blocks per group (ResNet-18 style)
+        self.layer1 = self._make_layer(filters=64, num_blocks=2, strides=1)
+        self.layer2 = self._make_layer(filters=128, num_blocks=2, strides=2)
+        self.layer3 = self._make_layer(filters=256, num_blocks=2, strides=2)
+        self.layer4 = self._make_layer(filters=512, num_blocks=2, strides=2)
 
         # Final classification layers
         self.global_pool = layers.GlobalAveragePooling2D()
+        self.dropout = layers.Dropout(0.5)  # <-- decrese the cells by 50% randomly 
         self.fc = layers.Dense(num_classes, activation='softmax')
     #----------------------------------------------------------------
 
@@ -90,6 +91,7 @@ class ResNet(Model):
 
         # Final classification
         x = self.global_pool(x)
+        x = self.dropout(x)  # <-- applying the dropout
         x = self.fc(x)
         
         return x
@@ -106,3 +108,4 @@ if __name__ == '__main__':
     model = build_resnet()
     print(f"Parameters: {model.count_params():,}")
     print("Model OK")
+
