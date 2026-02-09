@@ -82,7 +82,7 @@ display_sample_images(val_ds, class_names, "Validation Set (No Augmentation)")
 # Display sample images from training set (with augmentation)
 display_sample_images(train_ds, class_names, "Training Set (With Augmentation)")
 
-print("\n✅ Visualization complete! Check the generated PNG files in your project folder.")
+print("\n Visualization complete! Check the generated PNG files in your project folder.")
 
 
 
@@ -113,6 +113,7 @@ def plot_training_history(history):
     plt.tight_layout()
     plt.savefig('training_history.png')
     plt.show()
+
 
 
 
