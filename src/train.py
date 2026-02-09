@@ -40,7 +40,7 @@ def train_model():
   # Compile the Model 
   print ("Compiling Model.....")
 
-  optimizer = Adam (learning_rate = LEARNING_RATE)
+  optimizer = Adam (learning_rate = LEARNING_RATE, clipnorm=1.0)
   loss_fn = CategoricalCrossentropy()
   metrics = [CategoricalAccuracy(name='accuracy')]
 
@@ -130,6 +130,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
