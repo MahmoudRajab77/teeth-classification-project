@@ -45,13 +45,20 @@ def get_data_loaders():
         return img, label_tensor
     
     
-    # load datasets from directories 
+    # Load datasets 
     train_dataset = keras.utils.image_dataset_from_directory(
         Config.TRAIN_DIR, 
-        image_size = img_size,
-        batch_size = config.BATCH_SIZE,
-        label_mode = 'categorical'      # this creates one-hot encoded labels for the 7 calsses 
+        image_size=img_size,
+        batch_size=config.BATCH_SIZE,
+        label_mode='categorical',  # This should give shape (batch_size, NUM_CLASSES)
+        shuffle=True  # ADD THIS
     )
+
+    # DEBUG: Check if labels are correct
+    for images, labels in train_dataset.take(1):
+        print(f"DEBUG loader: Labels shape: {labels.shape}")
+        print(f"DEBUG loader: Unique label values: {np.unique(np.argmax(labels.numpy(), axis=1))}")
+        break
     
     val_dataset = keras.utils.image_dataset_from_directory(
         config.VAL_DIR, 
