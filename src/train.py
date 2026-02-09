@@ -17,13 +17,35 @@ from utils import plot_training_history
 config = Config()
 
 # Training Hyperparameters 
-LEARNING_RATE = 0.0003  # Reduced for better convergence
-WARMUP_EPOCHS = 10
+LEARNING_RATE = 0.0005  # Reduced for better convergence
+WARMUP_EPOCHS = 5
 NUM_EPOCHS = 150
 MODEL_SAVE_PATH = 'saved_models/resnet_model.h5'
 LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
 
+class FocalLoss(tf.keras.losses.Loss):
+    def __init__(self, alpha=0.25, gamma=2.0, label_smoothing=0.1):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.label_smoothing = label_smoothing
+        
+    def call(self, y_true, y_pred):
+        # Apply label smoothing
+        y_true = y_true * (1 - self.label_smoothing) + self.label_smoothing / y_true.shape[-1]
+        
+        # Cross entropy
+        ce = -y_true * tf.math.log(y_pred + 1e-7)
+        
+        # Focal loss weighting
+        p_t = y_true * y_pred + (1 - y_true) * (1 - y_pred)
+        alpha_t = y_true * self.alpha + (1 - y_true) * (1 - self.alpha)
+        focal_loss = alpha_t * (1 - p_t) ** self.gamma * ce
+        
+        return tf.reduce_sum(focal_loss, axis=-1)
+
+#-------------------------------------------------------------------------------------------------
 # Warmup Callback Class
 class WarmUpCallback(tf.keras.callbacks.Callback):
     def __init__(self, warmup_epochs=10, initial_lr=0.00003, target_lr=0.0003):
@@ -46,7 +68,7 @@ class WarmUpCallback(tf.keras.callbacks.Callback):
         if epoch == self.warmup_epochs - 1:
             print(f" Warmup complete. LR now fixed at {self.target_lr:.6f}")
 
-
+#------------------------------------------------------------------------------------------------------
 # The Training Function 
 def train_model():
     print("Start Training.....")
@@ -55,6 +77,8 @@ def train_model():
     print("Loading Dataset......")
     train_ds, val_ds, test_ds, class_names, class_weight_dict = get_data_loaders()
 
+    class_weight_dict = None  # temporarily to check 
+    
     # DATA VERIFICATION
     print("\n" + "="*50)
     print("DATA VERIFICATION")
@@ -87,7 +111,8 @@ def train_model():
     )
     
     # Loss with label smoothing for 7-class problem
-    loss_fn = CategoricalCrossentropy(label_smoothing=0.1)
+    #loss_fn = CategoricalCrossentropy(label_smoothing=0.1)
+    loss_fn = FocalLoss(alpha=0.25, gamma=2.0, label_smoothing=0.1)
     
     metrics = [CategoricalAccuracy(name='accuracy')]
 
@@ -179,7 +204,7 @@ def train_model():
     test_results = [0.0, test_accuracy]  # Dummy loss, real accuracy
     return model, history, test_results
 
-
+#-------------------------------------------------------------------------------------------------------
 # Main function
 if __name__ == '__main__':
     # Create necessary directories
@@ -197,3 +222,4 @@ if __name__ == '__main__':
     print(f"   Logs saved in: {LOG_DIR}")
     print("\nTo view training logs:")
     print(f"   tensorboard --logdir {LOG_DIR}")
+
