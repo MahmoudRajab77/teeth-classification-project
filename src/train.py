@@ -17,11 +17,26 @@ from utils import plot_training_history
 config = Config()
 
 # Training Hyperparameters 
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0003
+WARMUP_EPOCHS = 10
 NUM_EPOCHS = 150
 MODEL_SAVE_PATH = 'saved_models/resnet_model.h5'
 LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
+
+class WarmUpCallback(tf.keras.callbacks.Callback):
+    def __init__(self, warmup_epochs=10, initial_lr=0.00003, target_lr=0.0003):
+        super().__init__()
+        self.warmup_epochs = warmup_epochs
+        self.initial_lr = initial_lr
+        self.target_lr = target_lr
+    
+    def on_epoch_begin(self, epoch, logs=None):
+        if epoch < self.warmup_epochs:
+            lr = self.initial_lr + (self.target_lr - self.initial_lr) * (epoch / self.warmup_epochs)
+            tf.keras.backend.set_value(self.model.optimizer.lr, lr)
+            if epoch % 5 == 0:
+                print(f"Epoch {epoch+1}: Warmup LR = {lr:.6f}")
 
 #------------------------------------------------------------
 
@@ -56,8 +71,8 @@ def train_model():
   # Compile the Model 
   print ("Compiling Model.....")
 
-  optimizer = Adam (learning_rate = LEARNING_RATE, clipnorm=1.0)
-  loss_fn = CategoricalCrossentropy()
+  optimizer = Adam (learning_rate=LEARNING_RATE, clipnorm=1.0, beta_1=0.9, beta_2=0.999)
+  loss_fn = CategoricalCrossentropy(label_smoothing=0.1)
   metrics = [CategoricalAccuracy(name='accuracy')]
 
   model.compile(optimizer = optimizer, loss = loss_fn, metrics = metrics)
@@ -65,6 +80,9 @@ def train_model():
 
   # Setup callbacks
   callbacks = [
+
+    WarmUpCallback(warmup_epochs=WARMUP_EPOCHS, initial_lr=0.00003, target_lr=0.0003),
+    
     # Save best model (based on validation accuracy)
     tf.keras.callbacks.ModelCheckpoint(
         'saved_models/best_model.h5',
@@ -164,6 +182,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
