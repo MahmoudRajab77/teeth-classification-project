@@ -77,7 +77,6 @@ class ResNet(Model):
     # A functtion to create a layer of residual blocks
     def _make_layer(self, filters, num_blocks, strides, dropout_rate):
         layers_list = []
-        # ✅ FIXED: Use 'ResidualBlock' (the actual class name), not 'ImprovedResidualBlock'
         layers_list.append(ResidualBlock(filters, strides=strides, dropout_rate=dropout_rate))
         for _ in range(1, num_blocks):
             layers_list.append(ResidualBlock(filters, strides=1, dropout_rate=dropout_rate))
@@ -131,7 +130,7 @@ class ResNet(Model):
 #--------------------------------------------------------------------------------------------
 # A function to build and return the ResNet Model
 def build_resnet(input_shape=(224, 224, 3), num_classes=7, dropout_rate=0.4):
-    """Build and return the enhanced ResNet model."""
+    
     # Create input layer
     inputs = tf.keras.Input(shape=input_shape)
     
@@ -142,7 +141,7 @@ def build_resnet(input_shape=(224, 224, 3), num_classes=7, dropout_rate=0.4):
     outputs = model(inputs)
     
     # Create a proper Keras Model
-    full_model = tf.keras.Model(inputs=inputs, outputs=outputs, name="enhanced_resnet_model")
+    full_model = tf.keras.Model(inputs=inputs, outputs=outputs, name="resnet_model")
     
     return full_model
 
@@ -162,7 +161,8 @@ if __name__ == '__main__':
     output_training = model(test_input, training=True)
     print(f"Training output shape: {output_training.shape}")
     
-    print("\n✅ Model built and tested successfully!")
+    print("\n Model built and tested successfully!")
+
 
 
 
