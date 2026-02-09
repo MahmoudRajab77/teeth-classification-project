@@ -4,6 +4,7 @@ from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import CategoricalAccuracy
 import matplotlib.pyplot as plt
 import os
+import numpy as np  
 from datetime import datetime
 # Import the project modules
 from config import Config
@@ -163,6 +164,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
