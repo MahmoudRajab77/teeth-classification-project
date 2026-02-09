@@ -32,10 +32,25 @@ def train_model():
   print ("Loading Dataset......")
   train_ds, val_ds, test_ds, class_names, class_weight_dict = get_data_loaders()
 
+  # DEBUG: Check data shapes
+  print(f"\nDEBUG: Number of classes: {len(class_names)}")
+  print(f"DEBUG: config.NUM_CLASSES: {config.NUM_CLASSES}")
+
+  for images, labels in train_ds.take(1):
+        print(f"DEBUG: Batch image shape: {images.shape}")
+        print(f"DEBUG: Batch label shape: {labels.shape}")
+        print(f"DEBUG: Label values sample: {labels[0].numpy()}")
+        break
 
   # build model 
   model = build_resnet(input_shape=(config.IMG_HEIGHT, config.IMG_WIDTH, 3), num_classes=config.NUM_CLASSES)
   model.summary()
+
+  # DEBUG: Test model output shape
+  test_input = tf.random.normal([1, config.IMG_HEIGHT, config.IMG_WIDTH, 3])
+  test_output = model(test_input, training=False)
+  print(f"DEBUG: Model output shape: {test_output.shape}")
+  print(f"DEBUG: Model output sample: {test_output.numpy()}")
 
   # Compile the Model 
   print ("Compiling Model.....")
@@ -130,6 +145,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
