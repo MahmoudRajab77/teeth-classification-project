@@ -112,13 +112,31 @@ def train_model():
     verbose=1
   )
 
+  '''
   # Evaluate on test set
   print("Evaluating on test dataset.....")
   test_results = model.evaluate(test_ds, verbose=0)
   print(f"\nTest Results:")
   print(f"   Loss: {test_results[0]:.4f}")
   print(f"   Accuracy: {test_results[1]:.4f}")
-    
+  '''
+
+  print("Evaluating on test dataset.....")
+  # Manually compute accuracy
+  total_correct = 0
+  total_samples = 0
+
+  for images, labels in test_ds:
+      predictions = model.predict(images, verbose=0)
+      pred_classes = np.argmax(predictions, axis=1)
+      true_classes = np.argmax(labels.numpy(), axis=1)
+      total_correct += np.sum(pred_classes == true_classes)
+      total_samples += len(images)
+
+  test_accuracy = total_correct / total_samples
+  print(f"\nTest Accuracy: {test_accuracy:.4f}")
+  test_results = [0.0, test_accuracy]  # Dummy loss, real accuracy
+  
   # Plot training history
   print("Plotting training history.....")
   plot_training_history(history)
@@ -145,6 +163,7 @@ if __name__ == '__main__':
   print(f"   Final Test Accuracy: {test_results[1]:.4f}")
   print(f"   Model saved in: saved_models/")
   print(f"   Logs saved in: {LOG_DIR}")
+
 
 
 
