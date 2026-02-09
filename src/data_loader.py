@@ -20,14 +20,11 @@ def get_data_loaders():
     
     # Data augmentation for the training set - REVISED
     data_augmentation = keras.Sequential([
-       layers.RandomFlip("horizontal"),  # Only horizontal for dental symmetry
-        layers.RandomRotation(0.1),  # Reduced from 0.2
-        layers.RandomZoom(0.05),  # Reduced from 0.1
-        layers.RandomBrightness(0.1),  # Reduced from 0.2
-        layers.RandomContrast(0.1),  # Reduced from 0.2
-        # Medical-specific augmentations:
-        layers.GaussianNoise(0.01),  # Add slight noise for robustness
-        # Remove RandomSaturation for grayscale/medical images
+       layers.RandomFlip("horizontal"), 
+       layers.RandomRotation(0.05),     
+       # ADD dental-specific augmentations:
+       layers.GaussianNoise(0.01),       # Small noise for robustness
+       layers.RandomTranslation(0.05, 0.05),  # Small translations
     ])
     
     
