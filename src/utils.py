@@ -50,8 +50,9 @@ def display_sample_images(dataset, class_names, title, num_samples=8):
     print(f"Displaying {title}...")
     
     plt.figure(figsize=(12, 6))
-    batch = next(iter(dataset.take(1)))
-    images, labels = batch
+    for batch in dataset.take(1):
+        images, labels = batch
+        break
     
     for i in range(min(num_samples, len(images))):
         # Get the class name from one-hot encoded label
@@ -113,6 +114,7 @@ def plot_training_history(history):
     plt.tight_layout()
     plt.savefig('training_history.png')
     plt.show()
+
 
 
 
