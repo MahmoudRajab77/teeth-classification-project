@@ -25,16 +25,12 @@ LOG_DIR = 'logs/fit/' + datetime.now().strftime('%Y%m%d-%H%M%S')
 
 
 class FocalLoss(tf.keras.losses.Loss):
-    def __init__(self, alpha=0.25, gamma=2.0, label_smoothing=0.1):
+    def __init__(self, alpha=0.25, gamma=2.0):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
-        self.label_smoothing = label_smoothing
-        
+    
     def call(self, y_true, y_pred):
-        # Apply label smoothing
-        y_true = y_true * (1 - self.label_smoothing) + self.label_smoothing / y_true.shape[-1]
-        
         # Cross entropy
         ce = -y_true * tf.math.log(y_pred + 1e-7)
         
@@ -44,7 +40,6 @@ class FocalLoss(tf.keras.losses.Loss):
         focal_loss = alpha_t * (1 - p_t) ** self.gamma * ce
         
         return tf.reduce_sum(focal_loss, axis=-1)
-
 #-------------------------------------------------------------------------------------------------
 # Warmup Callback Class
 class WarmUpCallback(tf.keras.callbacks.Callback):
@@ -112,7 +107,7 @@ def train_model():
     
     # Loss with label smoothing for 7-class problem
     #loss_fn = CategoricalCrossentropy(label_smoothing=0.1)
-    loss_fn = FocalLoss(alpha=0.25, gamma=2.0, label_smoothing=0.1)
+    loss_fn = FocalLoss(alpha=0.25, gamma=2.0)
     
     metrics = [CategoricalAccuracy(name='accuracy')]
 
@@ -222,4 +217,5 @@ if __name__ == '__main__':
     print(f"   Logs saved in: {LOG_DIR}")
     print("\nTo view training logs:")
     print(f"   tensorboard --logdir {LOG_DIR}")
+
 
