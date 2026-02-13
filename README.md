@@ -37,7 +37,7 @@ text
 - The model is inspired by the paper found in this link: https://drive.google.com/file/d/1AQH_tkjcMzxrpddNNH_eyxpBtA6kwgZW/view?usp=sharing
 
 ## How to Run
-1. Clone the repository: `git clone https://github.com/YOUR_USERNAME/dental-disease-classification-resnet.git`
+1. Clone the repository: `git clone https://github.com/MahmoudRajab77/dental-disease-classification-resnet.git`
 2. Install dependencies: `pip install -r requirements.txt`
 3. Run the train file: `python src/train.py`
 
