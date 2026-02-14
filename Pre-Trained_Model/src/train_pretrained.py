@@ -13,7 +13,7 @@ from pretrained_model import create_pretrained_model
 def train_pretrained():
   print("Starting training the model......")
   print("Loading Data.....")
-  train_ds, valid_ds, test_ds, num_classes, class_weight_dict = get_data_loaders()
+  train_ds, valid_ds, test_ds, class_names, class_weight_dict = get_data_loaders()
 
   print("Data loaded Successfully!")
 
