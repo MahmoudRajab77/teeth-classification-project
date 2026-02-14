@@ -29,7 +29,7 @@ def create_pretrained_model(input_shape=(244,244,3), num_classes=7):
   model = models.Sequential ([
     layers.Input(shape = input_shape),              # first layer (input layer)
     layers.Lambda(lambda x: (x - 0.5) * 2),         # A layer Convert our image values from [0, 1] to [-1, 1] using lambda to fit the MobileNetV2 input
-    base_mdel,                                      # the third layer 
+    base_model,                                      # the third layer 
     layers.BatchNormilzation(),                     # Fourth layer
     layers.Dropout(0.3),                            # Drop 30% of cells randomly during the training to prevent overfitting 
     layers.Dense(256, activation = 'relu'),         # a layer of 256 neurons 
