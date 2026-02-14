@@ -140,7 +140,7 @@ def train_pretrained():
 #----------------------------------------------------------------
 
 
-if __name__ = '__main__':
+if __name__ == '__main__':
    os.makedirs('saved_models', exist_ok=True)
    model, history, test_accuracy = train_pretrained()
 
