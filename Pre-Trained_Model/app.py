@@ -25,7 +25,7 @@ st.markdown("---")
 # loading the model 
 @st.cache_resource
 def get_model():
-    # المسار الصحيح لـ Colab
+   
     model_path = '/content/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
     
     print(f"Looking for model at: {model_path}")
@@ -64,7 +64,6 @@ with col1:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_column_width=True)
             
-            # حفظ الصورة في session state عشان نستخدمها بعدين
             st.session_state['uploaded_image'] = image
             
         except Exception as e:
