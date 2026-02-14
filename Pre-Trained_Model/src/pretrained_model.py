@@ -27,7 +27,7 @@ def create_pretrained_model(input_shape=(244,244,3), num_classes=7):
   base_model.trainable = False        # freeze the model don't train it or change the weights 
 
   model = models.Sequential ([
-    layers.input(shape = input_shape),              # first layer (input layer)
+    layers.Input(shape = input_shape),              # first layer (input layer)
     layers.Lambda(lambda x: (x - 0.5) * 2),         # A layer Convert our image values from [0, 1] to [-1, 1] using lambda to fit the MobileNetV2 input
     base_mdel,                                      # the third layer 
     layers.BatchNormilzation(),                     # Fourth layer
