@@ -17,10 +17,11 @@ def train_pretrained():
 
   print("Data loaded Successfully!")
 
+  '''
   # printing the classes names 
   for i, name in enumerate(class_names):
     print (f"    -{name}")
-
+  '''
   # Call the function to build the model 
   model, base_model = create_pretrained_model(
     input_shape = (Config.IMG_HEIGHT, Config.IMG_WIDTH, 3), 
