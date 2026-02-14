@@ -57,7 +57,7 @@ def train_pretrained():
     tf.keras.callbacks.EarlyStopping(
       monitor = 'val_accuracy', 
       patience = 10,       # wait for 10 epochs before stopping 
-      restore_best_weights = True   # restoring the weights that give the best accuracy 
+      restore_best_weights = True,   # restoring the weights that give the best accuracy 
       verbose = 1
     ), 
 
