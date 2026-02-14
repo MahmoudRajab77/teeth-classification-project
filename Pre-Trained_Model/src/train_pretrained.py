@@ -88,7 +88,7 @@ def train_pretrained():
   print("\nEvaluating the model over test data.....")
   test_loss, test_accuracy = model.evaluate(test_ds, verbose = 0)
   print(f"\n    Test Loss: {test_loss:.4f}")
-  print(f"    Test Accuracy: {test_acc:.4f}")
+  print(f"    Test Accuracy: {test_accuracy:.4f}")
 
 
   # plotting the training Curves
