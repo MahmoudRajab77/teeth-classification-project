@@ -31,10 +31,10 @@ def get_model():
     print(f"Looking for model at: {model_path}")
     
     if os.path.exists(model_path):
-        print("✅ Model found!")
+        print(" Model found!")
         return load_model(model_path)
     else:
-        print("❌ Model not found!")
+        print(" Model not found!")
         return None
 
 with st.spinner("Loading model..."):
