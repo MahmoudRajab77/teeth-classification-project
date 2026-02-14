@@ -54,20 +54,27 @@ with col1:
     
     uploaded_file = st.file_uploader(
         "Choose your teeth images to classify:",
-        type=['jpg', 'jpeg', 'png', 'bmp'],
+        type=['jpg', 'jpeg', 'png', 'bmp', 'JPG', 'JPEG', 'PNG', 'BMP'],
         help="Images must be clear!"
     )
     
     if uploaded_file is not None:
-        # Displaying uploaded images 
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded images", use_column_width=True)
-
+        try:
+            # Displaying uploaded images 
+            image = Image.open(uploaded_file)
+            st.image(image, caption="Uploaded Image", use_container_width=True)
+            
+            # حفظ الصورة في session state عشان نستخدمها بعدين
+            st.session_state['uploaded_image'] = image
+            
+        except Exception as e:
+            st.error(f"Error opening image: {e}")
 with col2:
     st.header("Classification Results")
     
-    if uploaded_file is not None:
+    if uploaded_file is not None and 'uploaded_image' in st.session_state:
         if st.button("Classify", type="primary"):
+            image = st.session_state['uploaded_image']
             with st.spinner("Image is loading..."):
                 # preparing the image
                 processed_image = preprocess_image(image)
