@@ -32,7 +32,7 @@ def get_model():
     
     if not os.path.exists(model_path):
         print(f" Model file not found at: {model_path}")
-       
+        alt_path = 'teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
         if os.path.exists(alt_path):
             print(f" Found at alternative path: {alt_path}")
             return load_model(alt_path)
