@@ -6,7 +6,21 @@ This project implements a **ResNet architecture from scratch** using TensorFlow 
 ## Project Structure
 teeth-classification-project/
 
-├── src/ # Source code
+├── Pre-Trained_Model/
+│ ├── app.py
+│ ├── requirements.txt
+│ ├── src/
+  │ ├── config.py
+  │ ├── data_loader.py
+  │ ├── pretrained_model.py
+  │ ├── train_pretrained.py
+  │ ├── pretrained_training_history.png
+  │ ├── utils.py
+  │ ├── saved_models/
+    │ ├── Pretrained_BestModel.h5
+    │ ├── pretrained_final.h5
+
+├── src/ # Model from scratch
 
 │ ├── config.py # Configuration settings
 
