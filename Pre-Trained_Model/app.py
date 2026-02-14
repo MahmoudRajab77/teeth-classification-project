@@ -62,7 +62,7 @@ with col1:
         try:
             # Displaying uploaded images 
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Image", use_container_width=True)
+            st.image(image, caption="Uploaded Image", use_column_width=True)
             
             # حفظ الصورة في session state عشان نستخدمها بعدين
             st.session_state['uploaded_image'] = image
