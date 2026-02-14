@@ -14,23 +14,23 @@ teeth-classification-project/
 
 │ ├── src/
 
-  │ ├── config.py
+| │ ├──── config.py
   
-  │ ├── data_loader.py
+| │ ├──── data_loader.py
   
-  │ ├── pretrained_model.py
+| │ ├──── pretrained_model.py
   
-  │ ├── train_pretrained.py
+| │ ├──── train_pretrained.py
   
-  │ ├── pretrained_training_history.png
+| │ ├──── pretrained_training_history.png
   
-  │ ├── utils.py
+| │ ├──── utils.py
   
-  │ ├── saved_models/
+| │ ├──── saved_models/
   
-  │ ├── Pretrained_BestModel.h5
+| | │ ├──── Pretrained_BestModel.h5
     
-  │ ├── pretrained_final.h5
+| | │ ├──── pretrained_final.h5
 
 ├── src/ # Model from scratch
 
