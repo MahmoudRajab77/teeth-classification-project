@@ -26,13 +26,13 @@ st.markdown("---")
 @st.cache_resource
 def get_model():
     # Use direct absolute path
-    model_path = 'teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
+    model_path = '/mount/src/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
     
     print(f"Trying to load model from: {model_path}")
     
     if not os.path.exists(model_path):
         print(f" Model file not found at: {model_path}")
-        alt_path = 'teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
+        alt_path = '/mount/src/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
         if os.path.exists(alt_path):
             print(f" Found at alternative path: {alt_path}")
             return load_model(alt_path)
