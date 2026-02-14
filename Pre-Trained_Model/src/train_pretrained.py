@@ -18,7 +18,7 @@ def train_pretrained():
   print("Data loaded Successfully!")
 
   # printing the classes names 
-  for i, name in enumerate(calss_names):
+  for i, name in enumerate(class_names):
     print (f"    -{name}")
 
   # Call the function to build the model 
