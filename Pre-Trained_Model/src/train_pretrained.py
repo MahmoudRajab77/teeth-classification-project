@@ -78,7 +78,7 @@ def train_pretrained():
   
   history = model.fit(
     train_ds, 
-    validation_data = val_ds, 
+    validation_data = valid_ds, 
     epochs = 30, 
     callbacks = callbacks, 
     verbose = 1
