@@ -25,10 +25,21 @@ st.markdown("---")
 # loading the model 
 @st.cache_resource
 def get_model():
-    """Loading and storing the model in cache"""
-    model_path = os.path.join('src', 'saved_models', 'Pretrained_BestModel.h5')
+    # جلب المسار الحالي للملف
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(current_dir, 'src', 'saved_models', 'Pretrained_BestModel.h5')
+    
+    print(f"Trying to load model from: {model_path}")
+    
+    if not os.path.exists(model_path):
+        print(f"❌ Model file not found at: {model_path}")
+        # جرب مسار تاني
+        alt_path = os.path.join(current_dir, 'Pretrained_BestModel.h5')
+        if os.path.exists(alt_path):
+            return load_model(alt_path)
+        return None
+    
     return load_model(model_path)
-
 
 with st.spinner("Loading model..."):
     model = get_model()
