@@ -1,38 +1,26 @@
-# بيانات المشروع الأساسية - لا ترفعها
+# the dataset
 Teeth_Dataset/
 
-# ملفات بايثون المؤقتة والمترجمة
+# Python temporary files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
 
-# بيئات بايثون الافتراضية
-.env/
-venv/
-env/
-myenv/
-
-# إعدادات المحررات وملفات النظام
+# editor settings and system files
 .DS_Store
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# مخرجات التدريب (الموديلات، اللوجات، البلوتات)
-*.pth
-*.h5
-*.keras
 checkpoints/
 logs/
 runs/
 outputs/
-*.png  # احترافي: تجاهل كل الصور المولدة من الكود
-*.jpg
 
-# ملفات البيانات الكبيرة المؤقتة
+# large data files
 *.csv
 *.npy
 *.npz
