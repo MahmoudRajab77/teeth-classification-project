@@ -25,20 +25,17 @@ st.markdown("---")
 # loading the model 
 @st.cache_resource
 def get_model():
-    # Use direct absolute path
-    model_path = '/mount/src/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
+    # المسار الصحيح لـ Colab
+    model_path = '/content/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
     
-    print(f"Trying to load model from: {model_path}")
+    print(f"Looking for model at: {model_path}")
     
-    if not os.path.exists(model_path):
-        print(f" Model file not found at: {model_path}")
-        alt_path = '/mount/src/teeth-classification-project/Pre-Trained_Model/src/saved_models/Pretrained_BestModel.h5'
-        if os.path.exists(alt_path):
-            print(f" Found at alternative path: {alt_path}")
-            return load_model(alt_path)
+    if os.path.exists(model_path):
+        print("✅ Model found!")
+        return load_model(model_path)
+    else:
+        print("❌ Model not found!")
         return None
-    
-    return load_model(model_path)
 
 with st.spinner("Loading model..."):
     model = get_model()
